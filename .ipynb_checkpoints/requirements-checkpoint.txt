@@ -1,0 +1,16 @@
+xarray
+zarr
+tqdm
+pooch
+PyYAML
+SimpleITK
+pandas
+scikit-image
+matplotlib
+tabulate
+prettytable
+h5py
+vtk
+tensorflow
+opencv-python
+itkwidgets[all]>=1.0a21
