@@ -21,3 +21,7 @@ pip install git+https://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@github.com/Open
 6. If you need to upgrade or uninstall the package at a later time, you can use the following commands:
 pip install --upgrade git+https://github.com/username/repo-name.git
 pip uninstall package-name
+
+
+Example Use:
+<img width="452" alt="image" src="https://github.com/OpenMSKImaging/MotionScoreCNN/assets/92020703/f4d8da86-4769-46b0-8eb5-dbd91b379762">
