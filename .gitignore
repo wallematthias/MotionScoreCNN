@@ -1,0 +1,3 @@
+# Ignore egg_info and ipynb checkpoints
+**/egg_info/
+**/*.ipynb_checkpoints/
