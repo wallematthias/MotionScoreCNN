@@ -26,3 +26,7 @@ pip uninstall package-name
 Example Use:
 
 <img width="452" alt="image" src="https://github.com/OpenMSKImaging/MotionScoreCNN/assets/92020703/f4d8da86-4769-46b0-8eb5-dbd91b379762">
+
+Please Cite:
+
+https://doi.org/10.1016/j.bone.2022.116607 
