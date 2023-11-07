@@ -14,7 +14,7 @@ pip install git+https://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@github.com/Open
 
 3. If the package has any dependencies, pip will automatically download and install them for you.
 
-4. Once the installation is complete, you will be able to use `motiongrade` as command line funciton. With the following command line arguments. When running the script from command line, it will ask for the input path to the aim files. Provide a glob command (e.g. *.AIM to grade all AIM files in the current directory). Provide a stackheight (usually 168 for standard protocol) and a output path for the individual grades to be saved to. 
+4. Once the installation is complete, you will be able to use `motionscore` as command line funciton. With the following command line arguments. When running the script from command line, it will ask for the input path to the aim files. Provide a glob command (e.g. *.AIM to grade all AIM files in the current directory). Provide a stackheight (usually 168 for standard protocol) and a output path for the individual grades to be saved to. 
 
 5. Use the visual_inspection.ipynb to correct and summarise all grades in a single *.csv file. Right now manual correction only works for single stack I believe. 
 
