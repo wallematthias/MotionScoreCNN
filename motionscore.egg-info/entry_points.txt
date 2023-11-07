@@ -1,3 +1,0 @@
-[console_scripts]
-motionscore = motionscore.motionscore:main
-

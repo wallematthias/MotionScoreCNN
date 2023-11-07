@@ -1,8 +1,0 @@
-README.md
-setup.py
-motionscore.egg-info/PKG-INFO
-motionscore.egg-info/SOURCES.txt
-motionscore.egg-info/dependency_links.txt
-motionscore.egg-info/entry_points.txt
-motionscore.egg-info/requires.txt
-motionscore.egg-info/top_level.txt
