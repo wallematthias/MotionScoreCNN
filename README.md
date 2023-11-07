@@ -1,4 +1,4 @@
-# README for Stack Shift Artefact Correction Algorithm
+# README for Automatic Motion Grading
 
 This repository contains the implementation of a method for automatic HR-pQCT motion grading. 
 
