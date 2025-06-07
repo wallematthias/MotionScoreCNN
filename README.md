@@ -4,13 +4,11 @@ This repository contains the implementation of a method for automatic HR-pQCT mo
 
 ## Installation
 
-Requires: aim package
-pip install git+https://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@github.com/OpenMSKImaging/lightAIMwrapper/
 
 1. Open your terminal or command prompt.
 
 2. Run the following command to install the package via pip:
-pip install git+https://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@github.com/OpenMSKImaging/MotionScoreCNN/
+pip install git+https://github.com/wallematthias/MotionScoreCNN/
 
 3. If the package has any dependencies, pip will automatically download and install them for you.
 
@@ -19,8 +17,8 @@ pip install git+https://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@github.com/Open
 5. Use the visual_inspection.ipynb to correct and summarise all grades in a single *.csv file. Right now manual correction only works for single stack I believe. 
 
 6. If you need to upgrade or uninstall the package at a later time, you can use the following commands:
-pip install --upgrade git+https://github.com/username/repo-name.git
-pip uninstall package-name
+pip install --upgrade git+https://github.com/wallematthias/MotionScoreCNN/
+pip uninstall motionscorecnn
 
 
 Example Use:
