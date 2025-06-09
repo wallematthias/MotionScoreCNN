@@ -33,7 +33,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'motionscore=motionscore.motionscore:main',
+            'motionscore=motionscore.cli:main',
         ],
     },
 )
