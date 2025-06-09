@@ -29,8 +29,9 @@ We recommend installing in a dedicated conda environment:
 conda create -n motionscore python=3.8 -y
 conda activate motionscore
 
-# Install from GitHub
-pip install git+https://github.com/wallematthias/MotionScoreCNN
+# Clone the repository
+git clone https://github.com/wallematthias/MotionScoreCNN.git
+cd MotionScoreCNN
 
 # macOS users
 pip install .[mac]
@@ -38,6 +39,7 @@ pip install .[mac]
 # Linux/Windows users
 pip install .[unix]
 ```
+
 - Note: Tested on Apple Silicon (M3) install tensorflow manually if running in issues with freezing.
 ---
 
