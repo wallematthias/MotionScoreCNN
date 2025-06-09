@@ -3,8 +3,8 @@
 <img width="452" alt="image" src="https://github.com/OpenMSKImaging/MotionScoreCNN/assets/92020703/f4d8da86-4769-46b0-8eb5-dbd91b379762">
 
 Motion scoring for HR-pQCT using deep convolutional neural networks  
-Developed by Matthias Walle and collaborators  
-Citation: Walle et al., Bone (2023). https://doi.org/10.1016/j.bone.2022.116607
+Re-implementation 2025 by Matthias Walle and collaborators  
+Original Citation: Walle et al., Bone (2023). https://doi.org/10.1016/j.bone.2022.116607
 
 ---
 
