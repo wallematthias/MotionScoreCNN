@@ -43,6 +43,31 @@ pip install -e .[unix]
 - Note: Tested on Apple Silicon (M3) install tensorflow manually if running in issues with freezing.
 ---
 
+### Download Model Weights
+
+Before running the tool, download the pretrained model weights:
+
+1. Visit the following form to request download access:  
+   [https://forms.gle/cy6wkX83pgKvP5Z69](https://forms.gle/cy6wkX83pgKvP5Z69)
+
+2. Fill out the short request form. Access is typically granted within 5 minutes.
+
+3. Download the `.h5` model files named `DNN_0.h5` to `DNN_9.h5` and place them in the `motionscore/models/` folder inside the repository:
+
+```bash
+MotionScoreCNN/
+├── motionscore/
+│   ├── models/
+│   │   ├── DNN_0.h5
+│   │   ├── DNN_1.h5
+│   │   ├── ...
+│   │   └── DNN_9.h5
+```
+
+The tool will automatically load these models for prediction.
+
+---
+
 ## Usage
 
 The CLI supports two modes: `grade` and `confirm`.
