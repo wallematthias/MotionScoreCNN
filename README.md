@@ -38,7 +38,7 @@ pip install .[mac]
 # Linux/Windows users
 pip install .[unix]
 ```
-
+- Note: Tested on Apple Silicon (M3) install tensorflow manually if running in issues with freezing.
 ---
 
 ## Usage
@@ -77,10 +77,7 @@ motionscore confirm \
 
 If you use this software, please cite:
 
-Walle, M., Eggemann, D., Atkins, P.R., Kendall, J.J., Stock, K., Müller, R. and Collins, C.J., 2023.  
-Motion grading of high-resolution quantitative computed tomography supported by deep convolutional neural networks.  
-*Bone*, 166, p.116607.  
-https://doi.org/10.1016/j.bone.2022.116607
+Walle, M., Eggemann, D., Atkins, P.R., Kendall, J.J., Stock, K., Müller, R. and Collins, C.J., 2023. Motion grading of high-resolution quantitative computed tomography supported by deep convolutional neural networks. *Bone*, 166, p.116607. https://doi.org/10.1016/j.bone.2022.116607
 
 ---
 
