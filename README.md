@@ -125,7 +125,7 @@ Walle, M., Eggemann, D., Atkins, P.R., Kendall, J.J., Stock, K., Müller, R. and
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International.
 
 ---
 
