@@ -48,7 +48,7 @@ pip install -e .[unix]
 Before running the tool, download the pretrained model weights:
 
 1. Visit the following form to request download access:  
-   [https://forms.gle/cy6wkX83pgKvP5Z69](https://forms.gle/cy6wkX83pgKvP5Z69)
+   [Request Link](https://forms.gle/cy6wkX83pgKvP5Z69)
 
 2. Fill out the short request form. Access is typically granted within 5 minutes.
 
