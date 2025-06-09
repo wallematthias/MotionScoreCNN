@@ -1,30 +1,92 @@
-# README for Automatic Motion Grading
-
-This repository contains the implementation of a method for automatic HR-pQCT motion grading. 
-
-## Installation
-
-
-1. Open your terminal or command prompt.
-
-2. Run the following command to install the package via pip:
-pip install git+https://github.com/wallematthias/MotionScoreCNN/
-
-3. If the package has any dependencies, pip will automatically download and install them for you.
-
-4. Once the installation is complete, you will be able to use `motionscore` as command line funciton. With the following command line arguments. When running the script from command line, it will ask for the input path to the aim files. Provide a glob command (e.g. *.AIM to grade all AIM files in the current directory). Provide a stackheight (usually 168 for standard protocol) and a output path for the individual grades to be saved to. 
-
-5. Use the visual_inspection.ipynb to correct and summarise all grades in a single *.csv file. Right now manual correction only works for single stack I believe. 
-
-6. If you need to upgrade or uninstall the package at a later time, you can use the following commands:
-pip install --upgrade git+https://github.com/wallematthias/MotionScoreCNN/
-pip uninstall motionscorecnn
-
-
-Example Use:
+# MotionScoreCNN
 
 <img width="452" alt="image" src="https://github.com/OpenMSKImaging/MotionScoreCNN/assets/92020703/f4d8da86-4769-46b0-8eb5-dbd91b379762">
 
-Please Cite:
+Motion scoring for HR-pQCT using deep convolutional neural networks  
+Developed by Matthias Walle and collaborators  
+Citation: Walle et al., Bone (2023). https://doi.org/10.1016/j.bone.2022.116607
 
-https://doi.org/10.1016/j.bone.2022.116607 
+---
+
+## Overview
+
+`motionscore` is a Python 3.8 command-line tool for automated and manual motion grading of high-resolution quantitative computed tomography (HR-pQCT) scans. It uses an ensemble of deep neural networks to assess motion artifacts in 3D image volumes and generate visual diagnostics.
+
+---
+
+## Requirements
+
+This tool is **limited to Python 3.8** due to the Scanco AIM file format loader.
+
+---
+
+## Installation
+
+We recommend installing in a dedicated conda environment:
+
+```bash
+# Create and activate environment
+conda create -n motionscore python=3.8 -y
+conda activate motionscore
+
+# Install from GitHub
+pip install git+https://github.com/wallematthias/MotionScoreCNN
+
+# macOS users
+pip install .[mac]
+
+# Linux/Windows users
+pip install .[unix]
+```
+
+---
+
+## Usage
+
+The CLI supports two modes: `grade` and `confirm`.
+
+### Grade mode — automatic motion scoring
+
+```bash
+motionscore grade \
+  --input path/to/*.AIM \
+  --stackheight 168 \
+  --output path/to/output/
+```
+
+- Loads and scores each AIM image
+- Saves PNG visualizations
+- Prints stack and mean motion scores
+
+### Confirm mode — manual review of PNGs
+
+```bash
+motionscore confirm \
+  --input path/to/*motion.png \
+  --threshold 75 \
+  --output grades.csv
+```
+
+- Automatically accepts high-confidence predictions (e.g. over threshold 75%)
+- Displays low-confidence cases for manual review (enter new score in command line / empty = accept default)
+- Saves output and accuracy in a CSV
+
+---
+
+## Citation
+
+If you use this software, please cite:
+
+Walle, M., Eggemann, D., Atkins, P.R., Kendall, J.J., Stock, K., Müller, R. and Collins, C.J., 2023.  
+Motion grading of high-resolution quantitative computed tomography supported by deep convolutional neural networks.  
+*Bone*, 166, p.116607.  
+https://doi.org/10.1016/j.bone.2022.116607
+
+---
+
+## License
+
+This project is licensed under the MIT License.
+
+---
+

@@ -1,29 +1,48 @@
-
+# === Standard Library ===
+import argparse
 import os
 import warnings
+from glob import glob
+from pathlib import Path
+
+# === Environment setup ===
 warnings.filterwarnings("ignore")
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
-from aim import aim
-from skimage.filters import gaussian
-from skimage.measure import label   
-from glob import glob
-import tensorflow as tf
-from tensorflow import keras
-import numpy as np 
-from PIL import Image
+
+# === Third-Party ===
 import cv2
+import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
-from pathlib import Path
-from tensorflow.keras.preprocessing.image import img_to_array
+import numpy as np
 import pandas as pd
-from IPython.display import display, clear_output 
-from IPython.display import Image as iImage
+from PIL import Image
+from skimage.filters import gaussian
+from tensorflow.keras.layers import LeakyReLU
+from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing.image import img_to_array
+
+# === Local ===
+from aim import aim
 
 
 
 def pad_to_square(image):
+    """
+        Pads a 2D image to make it square by adding black borders.
+
+        Parameters
+        ----------
+        image : np.ndarray
+            Input 2D image as a NumPy array with shape (H, W) or (H, W, C).
+
+        Returns
+        -------
+        np.ndarray
+            Square-padded image with equal height and width.
+        """
+    ...
     height, width = image.shape[:2]
     size = max(height, width)
     top_pad = (size - height) // 2
@@ -34,6 +53,19 @@ def pad_to_square(image):
     return padded_image
 
 def preprocess_image(image):
+    """
+        Pads and resizes an image to 512x512 with normalized intensity.
+
+        Parameters
+        ----------
+        image : np.ndarray
+            Raw 2D image slice as a NumPy array.
+
+        Returns
+        -------
+        np.ndarray
+            Preprocessed image array suitable for DNN input (shape: 512x512x1).
+    """
     # Pad the image to square dimensions
     padded_image = pad_to_square(image)
 
@@ -49,6 +81,26 @@ def preprocess_image(image):
     return img_to_array(resized_image)
 
 def plot_slice(data, slices, scores):
+    """
+        Plots selected slices from a 3D image volume with their corresponding scores.
+
+        Parameters
+        ----------
+        data : np.ndarray
+            3D image volume of shape (H, W, D).
+        slices : list of int
+            Indices of the slices to display.
+        scores : list of int or float
+            Motion scores for each slice.
+
+        Returns
+        -------
+        fig : matplotlib.figure.Figure
+            The generated figure.
+        axes : list of matplotlib.axes.Axes
+            Axes for each subplot.
+    """
+    
     n_slices = len(slices) + 1
     # Compute the optimal figure width based on the size of the data array
     data_shape = np.rot90(data[:, :, slices[0]]).shape
@@ -65,6 +117,25 @@ def plot_slice(data, slices, scores):
     return fig, axes
 
 def get_indices(scores, confidences):
+    """
+        Selects the lowest, median, and highest scoring slices based on confidence.
+
+        Parameters
+        ----------
+        scores : list or np.ndarray
+            Predicted scores per slice.
+        confidences : list or np.ndarray
+            Confidence values associated with each score.
+
+        Returns
+        -------
+        indices : list of int
+            Indices of selected slices.
+        scores : list of int
+            Corresponding scores for selected slices.
+    """
+
+
     score_dict = {}
     for i, score in enumerate(scores):
         if score not in score_dict:
@@ -93,7 +164,47 @@ def get_indices(scores, confidences):
     return indices, scores
 
 def automatic_motion_score(im_raw, outpath=None, stackheight=168):
-    
+    """
+        Automatically computes motion scores from a 3D image using an ensemble of deep neural networks.
+
+        The image is smoothed, preprocessed, and each slice is scored using a voting-based ensemble
+        of trained CNN models. Slice-level scores are aggregated into stack-level motion scores,
+        and a visualization is generated and saved as a PNG.
+
+        Parameters
+        ----------
+        im_raw : np.ndarray
+            The raw 3D image volume with shape (H, W, D), typically from an AIM file.
+        
+        outpath : str or None, optional
+            The output file path prefix for saving the motion score plot. If None, defaults to the
+            directory of the input image.
+
+        stackheight : int, default=168
+            Number of slices per stack for computing stack-level scores. Will be reduced to fit if
+            the image depth is smaller.
+
+        Returns
+        -------
+        tuple
+            If multiple stacks are present:
+                - scores : np.ndarray of shape (N+1,)
+                    Stack-level motion scores followed by the mean motion score.
+                - confidences : np.ndarray of shape (N+1,)
+                    Average confidence values for each stack and overall.
+
+            If only one stack:
+                - score : float
+                    Mean motion score.
+                - confidence : float
+                    Average confidence of all slices.
+
+        Notes
+        -----
+        - Trained models are loaded from `models/*.h5` in the script directory.
+        - The resulting plot is saved as `{outpath}_{score}_{confidence}_motion.png`.
+        - Confidence is computed as the average of maximum softmax probabilities across all models.
+    """
     if stackheight>im_raw.shape[2]:
         print(f'Stackheight input {stackheight} larger than image {im_raw.shape[2]} reducing stackheight')
         stackheight = im_raw.shape[2]
@@ -102,7 +213,7 @@ def automatic_motion_score(im_raw, outpath=None, stackheight=168):
             os.path.dirname(
             Path(__file__)),
             'models','*.h5')))
-    DNN_list = [keras.models.load_model(model_path, custom_objects={'LeakyReLU': tf.keras.layers.LeakyReLU()}) for model_path in model_paths]
+    DNN_list = [load_model(model_path, custom_objects={'LeakyReLU': LeakyReLU()}) for model_path in model_paths]
 
     for i, DNN_model in enumerate(DNN_list):
         DNN_model._name = "model" + str(i)
@@ -194,34 +305,65 @@ def automatic_motion_score(im_raw, outpath=None, stackheight=168):
     filename = f'{outpath}_{mscore_int}_{mscore_percentage}_motion.png'
         
     plt.savefig(filename, transparent=False)
-    plt.show()
     plt.close(fig)
     if len(score) > 1:
         return np.append(score, mscore), np.append(scorevalue, mscorevalue)
     else:
         return mscore, mscorevalue
 
-def grade_images(image_folder_path,stackheight,outpath):
+def grade_images(file_paths, stackheight, outpath):
+    """
+        Applies automatic motion scoring to a list of AIM images and saves the results.
 
-    paths = glob(image_folder_path)
+        Each AIM file is loaded, scored using `automatic_motion_score`, and the result is
+        saved as a plot. Scores are printed for each file.
 
-    # Keywords to exclude (case-insensitive)
+        Parameters
+        ----------
+        file_paths : list of str
+            List of paths to `.AIM` image files.
+
+        stackheight : int
+            Number of slices per stack for motion scoring.
+
+        outpath : str
+            Directory where output images and results will be saved.
+    """
     exclude_keywords = ['mask', 'trab', 'cort']
-    
-    # Filter out images containing excluded keywords in their filename
-    paths = [path for path in paths if not any(keyword.lower() in os.path.basename(path).lower() for keyword in exclude_keywords)]
-    
+    paths = [p for p in file_paths if not any(k in os.path.basename(p).lower() for k in exclude_keywords)]
+
     for path in paths:
         file = aim.load_aim(path)
         name = os.path.basename(path).split('.')[0]
         mscore, mscorevalue = automatic_motion_score(
-            file.data, outpath=os.path.join(outpath,name), stackheight=stackheight)
-        
-        print('Motion Score {}: {}'.format(name,mscore))
-    
-def confirm_images(image_folder_path, confidence_threshold, output_path):
-    image_files = glob(image_folder_path)
+            file.data, outpath=os.path.join(outpath, name), stackheight=stackheight)
+        print(f'Motion Score {name}: {mscore}')
 
+def confirm_images(image_files, confidence_threshold, output_path):
+    """
+        Displays and manually confirms motion scores for PNG images, and records grading accuracy.
+
+        Images are expected to be named using the convention: `name_score_confidence_motion.png`.
+        If the confidence is below the threshold, the image is shown for manual confirmation.
+        Results are saved to a CSV file and overall accuracy is reported.
+
+        Parameters
+        ----------
+        image_files : list of str
+            List of paths to motion score PNG files (e.g., *_motion.png).
+
+        confidence_threshold : int
+            Minimum confidence (%) above which the score is automatically accepted.
+
+        output_path : str
+            Path to the CSV file where results will be saved.
+
+        Notes
+        -----
+        - Uses `matplotlib` to display images for manual review.
+        - Prompts for user input in the terminal if confidence is low.
+        - Output CSV includes filename, manual and automatic grades, and confidence.
+    """
     data = []
     total_images = len(image_files)
     graded_images = 0
@@ -235,59 +377,125 @@ def confirm_images(image_folder_path, confidence_threshold, output_path):
             confidence_default = int(file_parts[-2])
             filename = '_'.join(file_parts[:-3]) 
         else:
-            motion_score_default = ""
-            confidence_default = ""
-            filename = ""
-
-        grading_type = "automatic" if confidence_default >= confidence_threshold else "manual"
+            print(f"Skipping file '{image_path}' due to unexpected filename format.")
+            continue
 
         if confidence_default < confidence_threshold:
-            clear_output(wait=True)
             graded_images += 1
-            remaining_images = total_images - graded_images
-            print(f"Graded {graded_images} out of {total_images} images. {remaining_images} images remaining.")
-            display(iImage(filename=image_path))
+            print(f"Graded {graded_images}/{total_images} ({image_path})")
+
+            # Load and display the image using matplotlib
+            img = mpimg.imread(image_path)
+            plt.imshow(img)
+            plt.axis('off')
+            plt.title(f"{filename} (confidence: {confidence_default}%)")
+            plt.tight_layout()
+            plt.pause(0.001)
+            plt.show(block=False)
+
+            # Prompt for user input while image is shown
             motion_score = input(f"Enter your assessment for the motion score [{motion_score_default}]: ")
+            plt.close()
+
             if not motion_score:
                 motion_score = motion_score_default
-
         else:
             motion_score = motion_score_default
             graded_images += 1
 
-        data.append({'filename': filename, 'manual_grade': int(motion_score), 'automatic_grade': int(motion_score_default), 'confidence': int(confidence_default)})
+        data.append({
+            'filename': filename,
+            'manual_grade': int(motion_score),
+            'automatic_grade': int(motion_score_default),
+            'confidence': int(confidence_default)
+        })
 
-    data_df = pd.DataFrame(data)
-    data_df.to_csv(output_path, index=False)
+    df = pd.DataFrame(data)
+    df.to_csv(output_path, index=False)
 
-    correct_predictions = (data_df['manual_grade'] == data_df['automatic_grade']).sum()
-    total_predictions = len(data_df)
-    accuracy = correct_predictions / total_predictions
+    correct = (df['manual_grade'] == df['automatic_grade']).sum()
+    total = len(df)
+    accuracy = correct / total if total > 0 else 0.0
 
-    print("Grading completed. Graded data saved to '{}'.".format(output_path))
-    print(f"Accuracy: {accuracy * 100:.2f}%")
+    print(f"Grading complete. Saved to '{output_path}'. Accuracy: {accuracy:.2%}")
     
-def main(option='grade'):
-    # Get user input or specify the arguments here
+
+def parse_args():
+    """
+        Parses command-line arguments for grading or confirming motion scores.
+
+        Returns
+        -------
+        argparse.Namespace
+            Parsed arguments including mode, input files, output path, and additional options.
+
+        Modes
+        -----
+        - grade: Automatically scores a list of AIM files.
+            --input <*.AIM>
+            --stackheight <int>
+            --output <dir>
+
+        - confirm: Manually reviews motion score PNGs.
+            --input <*_motion.png>
+            --threshold <int>
+            --output <file.csv>
+    """
+    parser = argparse.ArgumentParser(description="Grade or confirm motion scores from medical images.")
     
+    subparsers = parser.add_subparsers(dest='mode', required=True)
+
+    # Subparser for grading
+    parser_grade = subparsers.add_parser('grade', help='Automatically grade a set of AIM images')
+    parser_grade.add_argument('--input', nargs='+', required=True, help='List of AIM image files (e.g., *.AIM)')
+    parser_grade.add_argument('--stackheight', type=int, default=168, help='Stack height to evaluate')
+    parser_grade.add_argument('--output', type=str, required=True, help='Directory to save graded results')
+
+    # Subparser for confirmation
+    parser_confirm = subparsers.add_parser('confirm', help='Manually confirm motion scores from PNG files')
+    parser_confirm.add_argument('--input', nargs='+', required=True, help='List of motion PNGs (e.g., *motion.png)')
+    parser_confirm.add_argument('--threshold', type=int, default=75, help='Confidence threshold (%) for automatic acceptance')
+    parser_confirm.add_argument('--output', type=str, required=True, help='CSV file path to save grading results')
+
+    return parser.parse_args()
+
+def main():
+    """
+        Main entry point for the MotionScore CLI tool.
+
+        Allows users to either:
+        - Automatically grade a set of AIM images (`grade` mode).
+        - Manually confirm motion scores from saved PNG outputs (`confirm` mode).
+
+        The selected mode and arguments are parsed using argparse, and the appropriate
+        function (`grade_images` or `confirm_images`) is called.
+
+        Citation
+        --------
+        If you use this tool in your research or publication, please cite:
+
+            Walle, M., Eggemann, D., Atkins, P.R., Kendall, J.J., Stock, K., Müller, R. and Collins, C.J., 2023.
+            Motion grading of high-resolution quantitative computed tomography supported by deep convolutional neural networks.
+            Bone, 166, p.116607.
+            https://doi.org/10.1016/j.bone.2022.116607
+    """
+    print("=" * 80)
+    print("If you use this tool, please cite:")
+    print()
+    print("   Walle, M., Eggemann, D., Atkins, P.R., Kendall, J.J., Stock, K., Müller, R. and Collins, C.J., 2023.")
+    print("   Motion grading of high-resolution quantitative computed tomography supported")
+    print("   by deep convolutional neural networks. Bone, 166, p.116607.")
+    print("   https://doi.org/10.1016/j.bone.2022.116607")
+    print("=" * 80)
+    print()
     
-    if option == 'confirm':
-        image_folder_path = input("Enter the image folder path (e.g., /path/to/data/*motion.png): ")
-        confidence_threshold = int(input("Enter the confidence threshold (e.g., 75 [%]): "))
-        output_path = input("Enter the output file path for graded data (e.g., graded_data.csv): ")
-    
-        # Call the function with user-provided arguments
-        confirm_images(image_folder_path, confidence_threshold, output_path)
-        
-    elif option=='grade':
-        image_folder_path = input("Enter the image folder path (e.g. /path/to/data/*.AIM): ")
-        stackheight = int(input("Enter the stackheight (e.g. 168): "))
-        output_path = input("Enter the output file path for graded data (e.g., /path/to/output/data/): ")
-        
-        grade_images(image_folder_path,stackheight,output_path)
-    else: 
-        print('Enter valid option grade/confirm')
-    
-    
+    args = parse_args()
+
+    if args.mode == 'grade':
+        grade_images(args.input, args.stackheight, args.output)
+
+    elif args.mode == 'confirm':
+        confirm_images(args.input, args.threshold, args.output)
+
 if __name__ == "__main__":
     main()

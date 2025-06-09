@@ -1,16 +1,8 @@
-xarray
-zarr
-tqdm
-pooch
-PyYAML
-SimpleITK
+opencv-python
 pandas
 scikit-image
 matplotlib
-tabulate
-prettytable
+Pillow
+numpy
 h5py
-vtk
-tensorflow
-opencv-python
-itkwidgets[all]>=1.0a21
+aim @ git+https://github.com/wallematthias/ScancoAIMreader.git
