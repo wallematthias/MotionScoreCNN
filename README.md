@@ -59,6 +59,7 @@ motionscore grade \
 - Loads and scores each AIM image
 - Saves PNG visualizations
 - Prints stack and mean motion scores
+- Note: When running this for the first time initialisation can be slow due to tensorflow. 
 
 ### Confirm mode — manual review of PNGs
 
@@ -72,6 +73,20 @@ motionscore confirm \
 - Automatically accepts high-confidence predictions (e.g. over threshold 75%)
 - Displays low-confidence cases for manual review (enter new score in command line / empty = accept default)
 - Saves output and accuracy in a CSV
+
+---
+
+## Workflow
+
+The typical workflow involves two steps:
+
+1. **Automatic Grading**  
+   Use `grade` mode to analyze a set of `.AIM` scans and generate motion scores. This will output PNG images visualizing slice-wise predictions.
+
+2. **Manual Confirmation and Aggregation**  
+   Use `confirm` mode on the saved PNGs to review automatic scores. High-confidence scores are accepted automatically, while low-confidence scores are shown for manual input. Final results are saved in a `.csv` file with accuracy metrics.
+
+This process ensures robust motion grading while enabling human oversight where needed.
 
 ---
 
