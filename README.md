@@ -34,10 +34,10 @@ git clone https://github.com/wallematthias/MotionScoreCNN.git
 cd MotionScoreCNN
 
 # macOS users
-pip install .[mac]
+pip install -e .[mac]
 
 # Linux/Windows users
-pip install .[unix]
+pip install -e .[unix]
 ```
 
 - Note: Tested on Apple Silicon (M3) install tensorflow manually if running in issues with freezing.

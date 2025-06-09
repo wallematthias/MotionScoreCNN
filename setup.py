@@ -13,7 +13,7 @@ unix_requirements = load_requirements('requirements-unix.txt')
 
 setup(
     name='motionscore',
-    version='1.0.0',
+    version='1.0.1',
     author='Matthias Walle',
     author_email='matthias.walle@ucalgary.ca',
     description='Motionscoring for HR-pQCT',
